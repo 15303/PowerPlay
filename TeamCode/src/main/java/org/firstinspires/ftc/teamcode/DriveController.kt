@@ -16,7 +16,7 @@ class DriveController(val robot: Robot) {
         }
     var angleCorrection = false
 
-    fun enableAngleCorrection(enabled: Boolean) {
+    fun enableAngleCorrection(enabled: Boolean = true) {
         angleCorrection = enabled
     }
 
