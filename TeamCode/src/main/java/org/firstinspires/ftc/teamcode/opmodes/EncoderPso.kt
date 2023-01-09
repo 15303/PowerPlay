@@ -15,7 +15,11 @@ class EncoderPso : LinearOpMode() {
         while (opModeIsActive()) {
             telemetry.addData("lifter", robot.lifter.currentPosition)
             telemetry.addData("fl", robot.fl.currentPosition)
+            telemetry.addData("fr", robot.fr.currentPosition)
+            telemetry.addData("bl", robot.bl.currentPosition)
+            telemetry.addData("br", robot.br.currentPosition)
             telemetry.update()
+
         }
     }
 }

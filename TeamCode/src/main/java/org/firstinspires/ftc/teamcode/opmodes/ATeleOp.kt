@@ -21,7 +21,7 @@ class ATeleOp : LinearOpMode() {
         robot.reset()
         robot.lifter.targetPosition = 0
         robot.lifter.mode = DcMotor.RunMode.RUN_TO_POSITION
-        robot.lifter.power = 0.75
+        robot.lifter.power = 1.0
 
         driveController = DriveController(robot)
 
@@ -33,7 +33,7 @@ class ATeleOp : LinearOpMode() {
             last = System.nanoTime()
 
             // drivetrain
-            val drive = (-gamepad1.left_stick_y).toDouble()/if (gamepad1.x) 1 else 2
+            val drive = (-gamepad1.left_stick_y - gamepad1.right_stick_y).toDouble()/if (gamepad1.x) 1 else 2
             val turn = gamepad1.left_stick_x.toDouble()/(if (gamepad1.x) 1 else 2)
             val strafe = gamepad1.right_stick_x.toDouble()
 
@@ -44,7 +44,8 @@ class ATeleOp : LinearOpMode() {
                 targetAngle = robot.getOrientation()
             }
             driveController.tick(drive, turn, strafe)
-
+            telemetry.addData("drive", drive)
+            telemetry.addData("turn", turn)
             telemetry.addData("targetAngle", targetAngle)
 
 
@@ -55,12 +56,12 @@ class ATeleOp : LinearOpMode() {
 //            } else {
 //                robot.lifter.power = 0.0
 //            }
-            if (gamepad2.a) robot.lifter.targetPosition = 0
-            else if (gamepad2.b && !gamepad2.start) robot.lifter.targetPosition = 1680
-            else if (gamepad2.x) robot.lifter.targetPosition = 2930
-            else if (gamepad2.y) robot.lifter.targetPosition = 4100
+            if (gamepad2.a) robot.lifter.targetPosition = Robot.LIFTER_GROUND_POS
+            else if (gamepad2.b && !gamepad2.start) robot.lifter.targetPosition = Robot.LIFTER_LOW_POS
+            else if (gamepad2.x) robot.lifter.targetPosition = Robot.LIFTER_MEDIUM_POS
+            else if (gamepad2.y) robot.lifter.targetPosition = Robot.LIFTER_HIGH_POS
 
-            val wish = (-gamepad2.left_stick_y.toDouble() - gamepad2.right_stick_y) * dt / 1000000
+            val wish = (-gamepad2.left_stick_y.toDouble() - gamepad2.right_stick_y) * dt / 800000
             if (wish != 0.0) robot.lifter.targetPosition += wish.toInt()
 
             robot.lifter.targetPosition = robot.lifter.targetPosition.coerceIn(0, 4440)
@@ -72,7 +73,7 @@ class ATeleOp : LinearOpMode() {
             }
             telemetry.addData("lifter", robot.lifter.currentPosition)
 
-            telemetry.addData("want", wish)
+            telemetry.addData("wish", wish)
             telemetry.addData("liftertarget", robot.lifter.targetPosition)
 
 //            if (gamepad2.a) {

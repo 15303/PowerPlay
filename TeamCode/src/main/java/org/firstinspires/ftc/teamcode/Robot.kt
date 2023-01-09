@@ -70,18 +70,30 @@ class Robot(val opMode: LinearOpMode) {
         return imu.angularOrientation.firstAngle.toDouble()
     }
 
-    fun drive(power: Double) = power(power, power, power, power)
+    fun drive(power: Number) = power(power, power, power, power)
 
-    fun power(fl: Double, fr: Double, bl: Double, br: Double) {
-        this.fl.power = fl
-        this.fr.power = fr
-        this.bl.power = bl
-        this.br.power = br
+    fun power(fl: Number, fr: Number, bl: Number, br: Number) {
+        this.fl.power = fl.toDouble()
+        this.fr.power = fr.toDouble()
+        this.bl.power = bl.toDouble()
+        this.br.power = br.toDouble()
     }
 
     fun reset() {
         lifter.mode = DcMotor.RunMode.STOP_AND_RESET_ENCODER
         lifter.mode = DcMotor.RunMode.RUN_WITHOUT_ENCODER
+
+        for (motor in motors) {
+            motor.mode = DcMotor.RunMode.STOP_AND_RESET_ENCODER
+            motor.mode = DcMotor.RunMode.RUN_WITHOUT_ENCODER
+        }
+    }
+
+    companion object {
+        const val LIFTER_GROUND_POS = 0
+        const val LIFTER_LOW_POS = 1680
+        const val LIFTER_MEDIUM_POS = 2930
+        const val LIFTER_HIGH_POS = 4100
     }
 }
 
