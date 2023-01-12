@@ -49,7 +49,7 @@ open class DriveController(val robot: Robot) {
     open fun driveToTargetPos(
         _drive: Double = 0.2,
         _turn: Double = 0.5,
-        targetPos: Int = this.targetPos,
+        targetPos: Int = this.currentPos,
         targetAngle: Double = this.targetAngle,
         time: Long = 2000
     ) {
@@ -93,6 +93,45 @@ open class DriveController(val robot: Robot) {
         }
         robot.drive(0)
     }
+
+    //slow and steady wins the race
+    fun slowDrive(
+        offset: Int,
+        _turn: Double = 0.5,
+        _drive: Double = 0.3
+    ) {
+        val target = currentPos + offset
+        if (offset >= 0) {
+//            robot.drive(0.3)
+            while (robot.opMode.opModeIsActive() && currentPos < target) {
+                val turn =
+                    if (angleCorrection) (angleDiff(currentAngle, targetAngle) * 0.04).coerceIn(-_turn, _turn)
+                    else 0.0
+                robot.power(
+                    _drive + turn,
+                    _drive - turn,
+                    _drive + turn,
+                    _drive - turn
+                )
+            }
+        } else {
+//            robot.drive(-0.3)
+            while (robot.opMode.opModeIsActive() && currentPos > target) {
+                val drive = -_drive
+                val turn =
+                    if (angleCorrection) (angleDiff(currentAngle, targetAngle) * 0.04).coerceIn(-_turn, _turn)
+                    else 0.0
+                robot.power(
+                    drive + turn,
+                    drive - turn,
+                    drive + turn,
+                    drive - turn
+                )
+            }
+        }
+        robot.drive(0)
+        robot.opMode.sleep(500)
+    }
 }
 
 class PIDDriveController(robot: Robot): DriveController(robot) {
@@ -108,12 +147,14 @@ class PIDDriveController(robot: Robot): DriveController(robot) {
 
         val starttime = System.currentTimeMillis()
 
-        val pid: MiniPID = MiniPID(0.0002, 0.00007, 0.0005)
-        pid.setOutputRampRate(0.03)
+//        val pid: MiniPID = MiniPID(0.000200, 0.0000120, 0.000090)
+        val pid: MiniPID = MiniPID(0.000400, 0.00001, 0.0)
+        pid.setOutputLimits(-_drive, _drive)
+//        pid.setOutputRampRate(0.08)
         var lastt = System.nanoTime()
 
         while (robot.opMode.opModeIsActive() && System.currentTimeMillis() < starttime+time) {
-            var pidoutput = pid.getOutput(currentPos.toDouble(), targetPos.toDouble())
+            val pidoutput = pid.getOutput(currentPos.toDouble(), targetPos.toDouble())
             val drive = pidoutput.coerceIn(-_drive, _drive)
             val turn =
                 if (angleCorrection) (angleDiff(currentAngle, targetAngle) * 0.04).coerceIn(-_turn, _turn)

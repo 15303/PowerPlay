@@ -46,6 +46,7 @@ class ATeleOp : LinearOpMode() {
             driveController.tick(drive, turn, strafe)
             telemetry.addData("drive", drive)
             telemetry.addData("turn", turn)
+            telemetry.addData("strafe", strafe)
             telemetry.addData("targetAngle", targetAngle)
 
 

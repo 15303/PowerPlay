@@ -17,13 +17,13 @@ class DriveToTargetTest: LinearOpMode() {
 
         controller.driveToTargetPos(
             0.4,
-            targetPos = controller.currentPos + 5000,
+            targetPos = controller.currentPos + 3000,
             time = 10000
         )
         sleep(2000)
         controller.driveToTargetPos(
             0.4,
-            targetPos = controller.currentPos - 5000,
+            targetPos = controller.currentPos - 3000,
             time = 10000
         )
     }
