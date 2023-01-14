@@ -4,6 +4,7 @@ import android.R.id
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName
+import org.firstinspires.ftc.teamcode.PolarizarPipeline
 import org.opencv.core.Mat
 import org.opencv.core.Point
 import org.opencv.core.Scalar
@@ -11,6 +12,7 @@ import org.opencv.imgproc.Imgproc
 import org.openftc.easyopencv.OpenCvCamera
 import org.openftc.easyopencv.OpenCvCamera.AsyncCameraOpenListener
 import org.openftc.easyopencv.OpenCvCameraFactory
+import org.openftc.easyopencv.OpenCvCameraRotation
 import org.openftc.easyopencv.OpenCvPipeline
 
 
@@ -23,33 +25,26 @@ class PolarizarTest: LinearOpMode() {
             hardwareMap.appContext.packageName
         )
 
+        telemetry.addLine("getting webcam")
+        telemetry.update()
         val webcamName: WebcamName = hardwareMap.get(WebcamName::class.java, "Webcam 1")
+        telemetry.addLine("creating webcam")
+        telemetry.update()
         val camera: OpenCvCamera =
             OpenCvCameraFactory.getInstance().createWebcam(webcamName, cameraMonitorViewId)
 
-        camera.setPipeline(object: OpenCvPipeline() {
-            override fun processFrame(input: Mat): Mat {
-                Imgproc.rectangle(
-                    input,
-                    Point(
-                        (input.cols() / 4).toDouble(),
-                        (input.rows() / 4).toDouble()
-                    ),
-                    Point(
-                        (input.cols() * (3f / 4f)).toDouble(),
-                        (input.rows() * (3f / 4f)).toDouble()
-                    ),
-                    Scalar(0.0, 255.0, 0.0), 4
-                )
-                return input
-            }
+        telemetry.addLine("setting pipeline")
+        telemetry.update()
+        camera.setPipeline(PolarizarPipeline())
 
-        })
-
+        telemetry.addLine("opening camera")
+        telemetry.update()
         camera.openCameraDeviceAsync(object : AsyncCameraOpenListener {
             override fun onOpened() {
                 // Usually this is where you'll want to start streaming from the camera (see section 4)
-                camera.startStreaming(800, 448)
+                camera.startStreaming(800, 448, OpenCvCameraRotation.UPRIGHT)
+                telemetry.addLine("opened")
+                telemetry.update()
             }
 
             override fun onError(errorCode: Int) {

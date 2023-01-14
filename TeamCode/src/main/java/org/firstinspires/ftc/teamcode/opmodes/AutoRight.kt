@@ -24,6 +24,9 @@ class AutoRight : LinearOpMode() {
         robot.lifter.targetPosition = 0
         robot.lifter.mode = DcMotor.RunMode.RUN_TO_POSITION
         robot.lifter.power = 0.75
+        robot.motors.forEach { it.mode = DcMotor.RunMode.STOP_AND_RESET_ENCODER }
+        robot.motors.forEach { it.mode = DcMotor.RunMode.RUN_USING_ENCODER }
+        robot.motors.forEach { it.zeroPowerBehavior = DcMotor.ZeroPowerBehavior.BRAKE }
 
         controller = DriveController(robot)
         controller.enableAngleCorrection()
@@ -37,7 +40,7 @@ class AutoRight : LinearOpMode() {
         sleep(2000)
 
         //drive over to the medium pole
-        controller.slowDrive(5700)
+        controller.slowDrive(5000)
 //        controller.driveToTargetPos(
 //            _drive = 0.5,
 //            targetPos = controller.currentPos + 5500,
@@ -49,7 +52,7 @@ class AutoRight : LinearOpMode() {
         //lift arm
         robot.lifter.targetPosition = Robot.LIFTER_MEDIUM_POS
         sleep(1000)
-        controller.slowDrive(1300)
+        controller.slowDrive(700)
 //        controller.driveToTargetPos(
 //            _drive = 0.3,
 //            targetPos = controller.currentPos + 1150
@@ -73,7 +76,7 @@ class AutoRight : LinearOpMode() {
         )
 
         //drive to 3rd tile
-        controller.slowDrive(5000)
+        controller.slowDrive(3700)
         controller.driveToTargetPos(
             targetAngle = controller.currentAngle - 90,
             time = 1500

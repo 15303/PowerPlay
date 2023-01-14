@@ -21,7 +21,7 @@ class ATeleOp : LinearOpMode() {
         robot.reset()
         robot.lifter.targetPosition = 0
         robot.lifter.mode = DcMotor.RunMode.RUN_TO_POSITION
-        robot.lifter.power = 1.0
+        robot.lifter.power = 0.8
 
         driveController = DriveController(robot)
 

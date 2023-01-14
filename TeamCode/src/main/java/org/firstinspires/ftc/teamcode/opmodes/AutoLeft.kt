@@ -24,6 +24,9 @@ class AutoLeft : LinearOpMode() {
         robot.lifter.targetPosition = 0
         robot.lifter.mode = DcMotor.RunMode.RUN_TO_POSITION
         robot.lifter.power = 0.75
+        robot.motors.forEach { it.mode = DcMotor.RunMode.STOP_AND_RESET_ENCODER }
+        robot.motors.forEach { it.mode = DcMotor.RunMode.RUN_USING_ENCODER }
+        robot.motors.forEach { it.zeroPowerBehavior = DcMotor.ZeroPowerBehavior.BRAKE }
 
         controller = DriveController(robot)
         controller.enableAngleCorrection()
@@ -37,10 +40,11 @@ class AutoLeft : LinearOpMode() {
         sleep(2000)
 
         //drive over to the medium pole
-        controller.driveToTargetPos(
-            _drive = 0.5,
-            targetPos = controller.currentPos + 5000,
-            time = 3000)
+        controller.slowDrive(5000)
+//        controller.driveToTargetPos(
+//            _drive = 0.5,
+//            targetPos = controller.currentPos + 5500,
+//            time = 3000)
         controller.driveToTargetPos(
             targetAngle = controller.currentAngle - 45,
             time = 1500
@@ -48,10 +52,11 @@ class AutoLeft : LinearOpMode() {
         //lift arm
         robot.lifter.targetPosition = Robot.LIFTER_MEDIUM_POS
         sleep(1000)
-        controller.driveToTargetPos(
-            _drive = 0.3,
-            targetPos = controller.currentPos + 1200
-        )
+        controller.slowDrive(700)
+//        controller.driveToTargetPos(
+//            _drive = 0.3,
+//            targetPos = controller.currentPos + 1150
+//        )
         //release cone
         robot.lifter.targetPosition -= 50
         sleep(500)
@@ -59,39 +64,49 @@ class AutoLeft : LinearOpMode() {
         sleep(250)
         robot.grabber.power = 0.0
 
-        //return, turn to 90 degrees
+        //return, turn to 0 degrees
         robot.lifter.targetPosition = Robot.LIFTER_GROUND_POS
+        controller.slowDrive(-1700)
+//        controller.driveToTargetPos(
+//            _drive = 0.3,
+//            targetPos = controller.currentPos - 1500
+//        )
         controller.driveToTargetPos(
-            _drive = 0.3,
-            targetPos = controller.currentPos - 1500
+            targetAngle = controller.currentAngle + 45
         )
+
+        //drive to 3rd tile
+        controller.slowDrive(3700)
         controller.driveToTargetPos(
-            targetAngle = controller.currentAngle - 45
+            targetAngle = controller.currentAngle + 90,
+            time = 1500
         )
 
         //drive to parking spot
         when (id) {
             1 -> {
-                controller.driveToTargetPos(
-                    _drive = 0.5,
-                    targetPos = controller.currentPos - 4000,
-                    time = 3000)
+                controller.slowDrive(4200)
+
+//                controller.driveToTargetPos(
+//                    _drive = 0.5,
+//                    targetPos = controller.currentPos - 4000,
+//                    time = 3000)
             }
             2 -> {
                 //do nothing, already in 2
             }
             3 -> {
-                controller.driveToTargetPos(
-                    _drive = 0.5,
-                    targetPos = controller.currentPos + 4000,
-                    time = 3000)
+                controller.slowDrive(-4200)
+
+//                controller.driveToTargetPos(
+//                    _drive = 0.5,
+//                    targetPos = controller.currentPos + 4000,
+//                    time = 3000)
             }
         }
 
         telemetry.addLine("done")
         telemetry.update()
         sleep(1000)
-
-
     }
 }
