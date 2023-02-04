@@ -65,12 +65,12 @@ class AutoRight : LinearOpMode() {
         robot.grabber.power = 0.0
 
         //return, turn to 0 degrees
-        robot.lifter.targetPosition = Robot.LIFTER_GROUND_POS
         controller.slowDrive(-1700)
 //        controller.driveToTargetPos(
 //            _drive = 0.3,
 //            targetPos = controller.currentPos - 1500
 //        )
+        robot.lifter.targetPosition = Robot.LIFTER_GROUND_POS
         controller.driveToTargetPos(
             targetAngle = controller.currentAngle - 45
         )

@@ -1,11 +1,13 @@
 package org.firstinspires.ftc.teamcode.opmodes
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
 import org.firstinspires.ftc.teamcode.Robot
 import kotlin.math.sign
 
 @TeleOp(name = "ATeleOp1P")
+@Disabled
 class ATeleOp1P : LinearOpMode() {
     lateinit var robot: Robot
     override fun runOpMode() {

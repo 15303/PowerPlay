@@ -25,6 +25,9 @@ class ATeleOp : LinearOpMode() {
 
         driveController = DriveController(robot)
 
+        var abstarget = 0
+        var lifterdrift = 0
+
         var targetAngle = 0.0
         var grabberOn = false
         var last = System.nanoTime()
@@ -57,22 +60,28 @@ class ATeleOp : LinearOpMode() {
 //            } else {
 //                robot.lifter.power = 0.0
 //            }
-            if (gamepad2.a) robot.lifter.targetPosition = Robot.LIFTER_GROUND_POS
-            else if (gamepad2.b && !gamepad2.start) robot.lifter.targetPosition = Robot.LIFTER_LOW_POS
-            else if (gamepad2.x) robot.lifter.targetPosition = Robot.LIFTER_MEDIUM_POS
-            else if (gamepad2.y) robot.lifter.targetPosition = Robot.LIFTER_HIGH_POS
+
+            if (gamepad1.dpad_up || gamepad2.dpad_up) lifterdrift+=3
+            if (gamepad1.dpad_down || gamepad2.dpad_down) lifterdrift-=3
+//            if (gamepad1.dpad_right || gamepad2.dpad_right) {
+//                robot.lifter.mode = DcMotor.RunMode.STOP_AND_RESET_ENCODER
+//                robot.lifter.mode = DcMotor.RunMode.RUN_TO_POSITION
+//            }
+
+            abstarget = if (gamepad2.a) Robot.LIFTER_GROUND_POS
+                else if (gamepad2.b && !gamepad2.start) Robot.LIFTER_LOW_POS
+                else if (gamepad2.x) Robot.LIFTER_MEDIUM_POS
+                else if (gamepad2.y) Robot.LIFTER_HIGH_POS
+                else abstarget
 
             val wish = (-gamepad2.left_stick_y.toDouble() - gamepad2.right_stick_y) * dt / 800000
-            if (wish != 0.0) robot.lifter.targetPosition += wish.toInt()
+            if (wish != 0.0) abstarget += wish.toInt()
 
-            robot.lifter.targetPosition = robot.lifter.targetPosition.coerceIn(0, 4440)
+            abstarget = abstarget.coerceIn(0, 4440)
+            robot.lifter.targetPosition = abstarget + lifterdrift
 
-            if (robot.lifter.targetPosition < 25 && robot.lifter.currentPosition < 75) {
-                robot.lifter.power = 0.0
-            } else if (robot.lifter.power == 0.0) {
-                robot.lifter.power = 0.75
-            }
             telemetry.addData("lifter", robot.lifter.currentPosition)
+            telemetry.addData("lifterdrift", lifterdrift)
 
             telemetry.addData("wish", wish)
             telemetry.addData("liftertarget", robot.lifter.targetPosition)

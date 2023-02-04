@@ -4,7 +4,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
 import org.firstinspires.ftc.teamcode.Robot
 
-@TeleOp(name = "CameraTest")
+@TeleOp(name = "ApriltagTest")
 class CameraTest: LinearOpMode() {
     override fun runOpMode() {
         val robot = Robot(this)
