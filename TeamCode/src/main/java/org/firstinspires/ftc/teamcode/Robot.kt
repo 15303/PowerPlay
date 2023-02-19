@@ -10,6 +10,7 @@ import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName
 import org.openftc.apriltag.AprilTagDetection
 import org.openftc.easyopencv.OpenCvCamera.AsyncCameraOpenListener
 import org.openftc.easyopencv.OpenCvCameraFactory
+import org.openftc.easyopencv.OpenCvCameraRotation
 import org.openftc.easyopencv.OpenCvWebcam
 
 class Robot(val opMode: LinearOpMode) {
@@ -99,12 +100,28 @@ class Robot(val opMode: LinearOpMode) {
 
 class RobotCamera(robot: Robot) {
     val webcam: OpenCvWebcam
-    val pipeline = AprilTagDetectionPipeline(tagsize, fx, fy, cx, cy)
+    var initialized = false
+        private set
+    val aprilTagPipeline = AprilTagDetectionPipeline(tagsize, fx, fy, cx, cy)
+    val polarizetPipeline = PolarizetPipeline()
     var lastRecognition: AprilTagDetection? = null
         get() {
-            field = pipeline.latestDetections.maxByOrNull { it.decisionMargin } ?: field
+            field = aprilTagPipeline.latestDetections.maxByOrNull { it.decisionMargin } ?: field
             return field
         }
+        private set
+    val pole_x: Double
+        get() {
+            return polarizetPipeline.pole_x
+        }
+
+    /**
+     * should only be called once per object, once called you mustn't try to
+     * get lastRecognition, and this will allow you to get pole_x
+     */
+    fun swapPipelines() {
+        webcam.setPipeline(polarizetPipeline)
+    }
 
     init {
         val cameraMonitorViewId: Int = robot.opMode.hardwareMap.appContext.resources
@@ -112,11 +129,12 @@ class RobotCamera(robot: Robot) {
 
         val camera = robot.opMode.hardwareMap.get(WebcamName::class.java, "Webcam 1")
         webcam = OpenCvCameraFactory.getInstance().createWebcam(camera, cameraMonitorViewId)
-        webcam.setPipeline(pipeline)
+        webcam.setPipeline(aprilTagPipeline)
 
         webcam.openCameraDeviceAsync(object : AsyncCameraOpenListener {
             override fun onOpened() {
-                webcam.startStreaming(800, 448)
+                webcam.startStreaming(640, 360, OpenCvCameraRotation.UPRIGHT)
+                initialized = true
             }
 
             override fun onError(errorCode: Int) {}

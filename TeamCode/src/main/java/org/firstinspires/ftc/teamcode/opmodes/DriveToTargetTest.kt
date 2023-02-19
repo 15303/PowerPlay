@@ -15,16 +15,12 @@ class DriveToTargetTest: LinearOpMode() {
         waitForStart()
         robot.reset()
 
-        controller.driveToTargetPos(
-            0.4,
-            targetPos = controller.currentPos + 3000,
-            time = 10000
+        controller.slowDrive(
+            3000
         )
         sleep(2000)
-        controller.driveToTargetPos(
-            0.4,
-            targetPos = controller.currentPos - 3000,
-            time = 10000
+        controller.slowDrive(
+            -3000
         )
     }
 

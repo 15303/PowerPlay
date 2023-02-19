@@ -1,8 +1,10 @@
 package org.firstinspires.ftc.teamcode
 
 import org.firstinspires.ftc.robotcore.external.Telemetry
+import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
+import kotlin.math.sign
 
 //interface DriveController {
 //    var targetAngle: Double
@@ -94,11 +96,102 @@ open class DriveController(val robot: Robot) {
         robot.drive(0)
     }
 
+    open fun turnToTarget(
+        _drive: Double = 0.2,
+        _turn: Double = 0.5,
+        targetPos: Int = this.currentPos,
+        getCurrentVal: () -> Double,
+        targetVal: Double,
+        time: Long = 500
+    ) {
+        this.targetAngle = targetAngle
+        this.targetPos = targetPos
+        val starttime = System.currentTimeMillis()
+        val values = ArrayDeque(List(1) { getCurrentVal() })
+
+        var lastt = System.nanoTime()
+
+        while (robot.opMode.opModeIsActive() && System.currentTimeMillis() < starttime+time) {
+            values.removeFirst()
+            values.addLast(getCurrentVal())
+            val drive = ((targetPos - currentPos) / 1000.0).coerceIn(-_drive, _drive)
+
+            var turn =
+                ((targetVal - values.average()) * -0.001).coerceIn(-_turn, _turn)
+            if (abs(turn) in 0.03..0.2) turn = 0.2 * sign(turn)
+
+            robot.power(
+                drive + turn,
+                drive - turn,
+                drive + turn,
+                drive - turn
+            )
+
+            telemetry.addData("currentPos", currentPos)
+            telemetry.addData("targetPos", targetPos)
+            telemetry.addData("error", targetPos - currentPos)
+            telemetry.addData("average", values.average())
+            telemetry.addData("getCurrentVal", getCurrentVal())
+            telemetry.addData("targetVal", targetVal)
+            telemetry.addData("turn", turn)
+            telemetry.update()
+
+            //consistent loop times of 10ms
+            val sleep = lastt / 1000000 + 10 - System.nanoTime() / 1000000
+            if (sleep > 0) {
+                robot.opMode.sleep(sleep)
+            }
+            lastt = System.nanoTime()
+        }
+        robot.drive(0)
+    }
+
+
+    open fun driveToTarget(
+        _drive: Double = 0.2,
+        _turn: Double = 0.5,
+        targetPos: Int = this.currentPos,
+        getCurrentVal: () -> Double,
+        targetVal: Double,
+        time: Long = 500
+    ) {
+        this.targetAngle = targetAngle
+        this.targetPos = targetPos
+        val starttime = System.currentTimeMillis()
+        val values = ArrayDeque(List(1) { getCurrentVal() })
+
+        var lastt = System.nanoTime()
+
+        while (robot.opMode.opModeIsActive() && System.currentTimeMillis() < starttime+time) {
+            values.removeFirst()
+            values.addLast(getCurrentVal())
+            val drive = ((targetPos - currentPos) / 1000.0).coerceIn(-_drive, _drive)
+
+            robot.power(drive, drive, drive, drive)
+
+            telemetry.addData("currentPos", currentPos)
+            telemetry.addData("targetPos", targetPos)
+            telemetry.addData("error", targetPos - currentPos)
+            telemetry.addData("average", values.average())
+            telemetry.addData("getCurrentVal", getCurrentVal())
+            telemetry.addData("targetVal", targetVal)
+            telemetry.update()
+
+            //consistent loop times of 10ms
+            val sleep = lastt / 1000000 + 10 - System.nanoTime() / 1000000
+            if (sleep > 0) {
+                robot.opMode.sleep(sleep)
+            }
+            lastt = System.nanoTime()
+        }
+        robot.drive(0)
+    }
+
     //slow and steady wins the race
     fun slowDrive(
         offset: Int,
         _turn: Double = 0.5,
-        _drive: Double = 0.3
+        _drive: Double = 0.35
     ) {
         val target = currentPos + offset
         if (offset >= 0) {
@@ -129,8 +222,28 @@ open class DriveController(val robot: Robot) {
                 )
             }
         }
+        //angle correct for like 200 more ms
+        val starttime = System.currentTimeMillis()
+        while (robot.opMode.opModeIsActive() && System.currentTimeMillis() < 200 + starttime) {
+//            val turn =
+//                if (angleCorrection) (angleDiff(currentAngle, targetAngle) * 0.04).coerceIn(-_turn, _turn)
+//                else 0.0
+//            val drive = ((targetPos - currentPos) / 1000.0).coerceIn(-_drive, _drive)
+
+            val drive = 0.0
+            val turn =
+                if (angleCorrection) (angleDiff(currentAngle, targetAngle) * 0.04).coerceIn(-_turn, _turn)
+                else 0.0
+
+            robot.power(
+                drive+turn,
+                drive-turn,
+                drive+turn,
+                drive-turn
+            )
+        }
         robot.drive(0)
-        robot.opMode.sleep(500)
+        robot.opMode.sleep(100)
     }
 }
 

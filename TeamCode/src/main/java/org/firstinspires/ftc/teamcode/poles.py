@@ -49,7 +49,7 @@ TRUE_PTS = np.float32([
     [-2,+1], [-1,+1], [ 0,+1], [+1,+1], [+2,+1],
              [-1,+2],          [+1,+2]
 ])
-START_POS = np.float32([+1.65,+1.82])
+START_POS = np.float32([+1.35,+1.82])
 CORNER_POS = np.float32([+3,+3])
 MAP_SIZE = 800
 

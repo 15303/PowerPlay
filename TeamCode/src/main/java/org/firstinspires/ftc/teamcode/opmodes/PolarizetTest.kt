@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName
 import org.firstinspires.ftc.teamcode.PolarizarPipeline
+import org.firstinspires.ftc.teamcode.PolarizetPipeline
 import org.opencv.core.Mat
 import org.opencv.core.Point
 import org.opencv.core.Scalar
@@ -16,8 +17,8 @@ import org.openftc.easyopencv.OpenCvCameraRotation
 import org.openftc.easyopencv.OpenCvPipeline
 
 
-@TeleOp(name = "PolarizarTest")
-class PolarizarTest: LinearOpMode() {
+@TeleOp(name = "PolarizetTest")
+class PolarizetTest: LinearOpMode() {
     override fun runOpMode() {
         val cameraMonitorViewId = hardwareMap.appContext.resources.getIdentifier(
             "cameraMonitorViewId",
@@ -35,9 +36,11 @@ class PolarizarTest: LinearOpMode() {
 
         telemetry.addLine("setting pipeline")
         telemetry.update()
-        camera.setPipeline(PolarizarPipeline())
+        val pipeline = PolarizetPipeline()
+        camera.setPipeline(pipeline)
 
-        telemetry.addLine("opening camera")
+        val s = "opening camera"
+        telemetry.addLine(s)
         telemetry.update()
         camera.openCameraDeviceAsync(object : AsyncCameraOpenListener {
             override fun onOpened() {
@@ -53,6 +56,11 @@ class PolarizarTest: LinearOpMode() {
        */
             }
         })
+        while (!isStarted) {
+            telemetry.addData("pole_x", pipeline.pole_x)
+            telemetry.update()
+        }
         waitForStart()
+
     }
 }
